@@ -1,5 +1,5 @@
 # base.Dockerfile
-FROM python:3.12-bookworm
+FROM python:3.12-slim
 WORKDIR /app
 
 # 1. Install uv for fast package installation
@@ -12,9 +12,11 @@ RUN uv pip install --system -r meta_requirements.txt
 # 3. Install common system-level dependencies (like GDAL)
 # Make newest libraries available, debian is by default rather outdated aka "stable"
 COPY util/unstable.sources /etc/apt/sources.list.d/unstable.sources
-RUN apt-get update && apt-get remove -y libssl3 && \
+RUN apt-get update && \
     apt-get install -y \
-    openssl-provider-legacy libexpat1 binutils libproj-dev libgdal-dev gdal-bin g++ && \
+    libexpat1 && \
+#    binutils libproj-dev gdal-bin g++ && \
+#    apt-get -y --no-upgrade -t unstable install libgdal-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # 4. Copy common wrapper scripts
