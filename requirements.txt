@@ -1,5 +1,8 @@
 prefect[docker]
 minio
-openeo
-pystac
+openeo==0.50.0
+pystac==1.14.3
 setuptools
+boto3
+dotenv
+rasterio==1.5.0
