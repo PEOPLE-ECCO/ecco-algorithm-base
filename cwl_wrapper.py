@@ -68,7 +68,11 @@ def persist_outputs(catalog: Catalog, output_dir: str, run_name: str) -> None:
         for asset in item.get_assets().values():
             if os.path.exists(asset.href):
                 dest_path = os.path.join(output_dir, os.path.basename(asset.href))
-                shutil.copy(asset.href, dest_path)
+                try:
+                    shutil.copy(asset.href, dest_path)
+                except shutil.SameFileError:
+                    pass
+                
                 asset.href = item.id
 
     # Store collection json
