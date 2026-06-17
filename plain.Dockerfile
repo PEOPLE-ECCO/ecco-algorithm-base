@@ -22,4 +22,5 @@ RUN apt-get update && \
 # 4. Copy common wrapper scripts
 COPY ./cwl_wrapper.py ./cwl_wrapper.py
 COPY ./prefect_wrapper.py ./prefect_wrapper.py
+COPY ./openeo_util.py ./openeo_util.py
 COPY ./__init__.py .

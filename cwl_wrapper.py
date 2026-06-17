@@ -10,6 +10,8 @@ import pystac
 from openeo.rest.connection import Connection
 from pystac import Catalog, ItemCollection
 
+from openeo_util import configure_batch_job_tracking
+
 
 class RunnableAlgorithm(ABC):
 
@@ -38,17 +40,7 @@ def get_openeo_connection() -> Connection:
         provider_id="CDSE"
     )
 
-    def create_job_logged(*args, **kwargs):
-        job = conn.create_job_orig(*args, **kwargs)
-        print(f"Tracking execution for job: {job.job_id}")
-        jobs.append(job)
-        return job
-
-    conn.execute = None  # We prevent sync execution until we have it logged
-    conn.create_job_orig = conn.create_job
-    conn.create_job = create_job_logged  # log all batch jobs to enable tracking
-
-    return conn
+    return configure_batch_job_tracking(conn, jobs)
 
 
 def persist_outputs(catalog: Catalog, output_dir: str, run_name: str) -> None:

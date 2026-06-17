@@ -29,4 +29,5 @@ RUN uv pip install --system -r meta_requirements.txt
 # Copy common wrapper scripts
 COPY ./cwl_wrapper.py ./cwl_wrapper.py
 COPY ./prefect_wrapper.py ./prefect_wrapper.py
+COPY ./openeo_util.py ./openeo_util.py
 COPY ./__init__.py .
