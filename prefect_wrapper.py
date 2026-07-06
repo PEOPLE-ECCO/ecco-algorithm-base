@@ -34,7 +34,9 @@ def get_openeo_connection() -> Connection:
     cdse_client_id = Secret.load("ecco-openeo-client-id").get()
     cdse_client_secret = Secret.load("ecco-openeo-client-secret").get()
 
-    conn = openeo.connect("https://openeofed.dataspace.copernicus.eu/").authenticate_oidc_client_credentials(
+    openeo_backend_url = os.getenv("OPENEO_BACKEND_URL", "https://openeofed.dataspace.copernicus.eu/")
+
+    conn = openeo.connect(openeo_backend_url).authenticate_oidc_client_credentials(
         client_id=cdse_client_id,
         client_secret=cdse_client_secret,
         provider_id="CDSE"

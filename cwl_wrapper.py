@@ -34,7 +34,9 @@ def get_openeo_connection() -> Connection:
     if not cdse_client_id or not cdse_client_secret:
         raise ValueError("CDSE_CLIENT_ID and CDSE_CLIENT_SECRET must be set as environment variables.")
 
-    conn = openeo.connect("https://openeofed.dataspace.copernicus.eu/").authenticate_oidc_client_credentials(
+    openeo_backend_url = os.getenv("OPENEO_BACKEND_URL", "https://openeofed.dataspace.copernicus.eu/")
+
+    conn = openeo.connect(openeo_backend_url).authenticate_oidc_client_credentials(
         client_id=cdse_client_id,
         client_secret=cdse_client_secret,
         provider_id="CDSE"
