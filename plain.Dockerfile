@@ -23,4 +23,5 @@ RUN apt-get update && \
 COPY ./cwl_wrapper.py ./cwl_wrapper.py
 COPY ./prefect_wrapper.py ./prefect_wrapper.py
 COPY ./openeo_util.py ./openeo_util.py
+COPY ./stac_metadata.py ./stac_metadata.py
 COPY ./__init__.py .

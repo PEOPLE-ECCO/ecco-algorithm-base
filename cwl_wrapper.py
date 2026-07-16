@@ -11,6 +11,7 @@ from openeo.rest.connection import Connection
 from pystac import Catalog, ItemCollection
 
 from openeo_util import configure_batch_job_tracking
+from stac_metadata import build_stac_properties
 
 
 class RunnableAlgorithm(ABC):
@@ -45,7 +46,7 @@ def get_openeo_connection() -> Connection:
     return configure_batch_job_tracking(conn, jobs)
 
 
-def persist_outputs(catalog: Catalog, output_dir: str, run_name: str) -> None:
+def persist_outputs(catalog: Catalog, output_dir: str, run_name: str, parameters: Dict) -> None:
     """
     Persists the output catalog and assets to a local directory.
     """
@@ -53,7 +54,8 @@ def persist_outputs(catalog: Catalog, output_dir: str, run_name: str) -> None:
         os.makedirs(output_dir)
 
     meta = {
-        "run_name": run_name
+        "run_name": run_name,
+        "properties": build_stac_properties(parameters),
     }
     collection = ItemCollection(items=catalog.get_items(recursive=True), extra_fields=meta)
 
@@ -155,7 +157,7 @@ def main() -> None:
     try:
         catalog = pystac.Catalog(id=run_name, description=f"Catalog for run: {run_name}")
         run_algo(algo, conn, catalog, parameters)
-        persist_outputs(catalog, output_dir, run_name)
+        persist_outputs(catalog, output_dir, run_name, parameters)
     except Exception as e:
         print(f"An error occurred during algorithm execution: {e}")
         # Potentially re-raise or handle as needed
