@@ -16,7 +16,7 @@ from prefect.client.orchestration import SyncPrefectClient
 from prefect.runtime import flow_run
 from pystac import Catalog, ItemCollection
 
-from openeo_util import configure_batch_job_tracking
+from openeo_util import configure_batch_job_tracking, get_backend_version
 from stac_metadata import build_stac_properties
 
 
@@ -47,7 +47,7 @@ def get_openeo_connection() -> Connection:
 
 
 @task(log_prints=True, cache_policy=NO_CACHE)
-def persist_outputs(catalog: Catalog, parameters: Dict) -> None:
+def persist_outputs(catalog: Catalog, parameters: Dict, conn: Connection) -> None:
     s3_url = Secret.load("ecco-s3-url").get()
     s3_akey = Secret.load("ecco-s3-access-key").get()
     s3_skey = Secret.load("ecco-s3-secret-key").get()
@@ -78,7 +78,7 @@ def persist_outputs(catalog: Catalog, parameters: Dict) -> None:
     # )
     meta = {
         "flow_run.name": flow_run.name,
-        "properties": build_stac_properties(parameters),
+        "properties": build_stac_properties(parameters, get_backend_version(conn)),
     }
     collection = ItemCollection(items=catalog.get_items(recursive=True), extra_fields=meta)
 
@@ -190,7 +190,7 @@ def run_algorithm(parameters: Dict) -> None:
         catalog = pystac.Catalog(id=flow_run.name, description=f"Catalog for Flow: {flow_run.name}")
         fetch_data(parameters)
         run(algo, conn, catalog, parameters)
-        persist_outputs(catalog, parameters)
+        persist_outputs(catalog, parameters, conn)
     except Exception as e:
         print(e)
     finally:

@@ -36,6 +36,18 @@ def wait_until_below_active_job_limit(conn) -> None:
         time.sleep(JOB_SCHEDULING_POLL_INTERVAL_SECONDS)
 
 
+def get_backend_version(conn):
+    """
+    Returns the openEO API version implemented by the connected backend
+    (e.g. "1.2.0"), or None if the capabilities document can't be fetched.
+    """
+    try:
+        return conn.capabilities().api_version()
+    except Exception as e:
+        print(f"could not fetch openEO backend version! {e}")
+        return None
+
+
 def configure_batch_job_tracking(conn, jobs):
     def create_job_logged(*args, **kwargs):
         job = conn.create_job_orig(*args, **kwargs)
