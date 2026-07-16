@@ -57,19 +57,23 @@ def persist_outputs(catalog: Catalog, output_dir: str, run_name: str, parameters
         "run_name": run_name,
         "properties": build_stac_properties(parameters, get_backend_version(conn)),
     }
-    collection = ItemCollection(items=catalog.get_items(recursive=True), extra_fields=meta)
 
     # Copy assets
     for item in catalog.get_items(recursive=True):
-        for asset in item.get_assets().values():
+        # item.assets (not item.get_assets(), which deep-copies) so href mutations stick
+        for asset in item.assets.values():
             if os.path.exists(asset.href):
-                dest_path = os.path.join(output_dir, os.path.basename(asset.href))
+                asset_filename = os.path.basename(asset.href)
+                dest_path = os.path.join(output_dir, asset_filename)
                 try:
                     shutil.copy(asset.href, dest_path)
                 except shutil.SameFileError:
                     pass
-                
-                asset.href = item.id
+
+                # collection.json and the asset now live side by side in output_dir
+                asset.href = asset_filename
+
+    collection = ItemCollection(items=catalog.get_items(recursive=True), extra_fields=meta)
 
     # Store collection json
     collection_path = os.path.join(output_dir, "collection.json")
